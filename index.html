@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Career Tracker | 求职准备追踪系统</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-deep: #0a0a0f;
@@ -218,6 +216,51 @@
             color: var(--accent-cyan);
             border-radius: 4px;
             margin-left: auto;
+        }
+
+        /* LeetCode Summary in Sidebar */
+        .leetcode-summary {
+            padding: 8px 20px 12px;
+            display: none;
+        }
+
+        .leetcode-summary.show {
+            display: block;
+        }
+
+        .leetcode-summary-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 11px;
+        }
+
+        .leetcode-summary-name {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .leetcode-summary-progress {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .leetcode-summary-bar {
+            width: 60px;
+            height: 4px;
+            background: var(--bg-main);
+            border-radius: 2px;
+            margin-left: 8px;
+            overflow: hidden;
+        }
+
+        .leetcode-summary-fill {
+            height: 100%;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+            transition: width 0.2s ease;
         }
 
         /* Data Management */
@@ -798,7 +841,16 @@
             transform: rotate(180deg);
         }
     </style>
-</head>
+<style>
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        </style></head>
 <body>
     <div class="app-container">
         <!-- Mobile Toggle -->
@@ -828,14 +880,17 @@
             </div>
 
             <div class="nav-section">
-                <div class="nav-item active" onclick="switchPage('dashboard')">
+                <div class="nav-item" onclick="switchPage('dashboard')">
                     <span class="nav-icon">📊</span>
                     <span>进度总览</span>
                 </div>
-                <div class="nav-item" onclick="switchPage('leetcode')">
+                <div class="nav-item active" onclick="switchPage('leetcode')">
                     <span class="nav-icon">💻</span>
                     <span>刷题追踪</span>
                     <span class="nav-badge" id="leetcode-badge">0/100</span>
+                </div>
+                <div class="leetcode-summary" id="leetcode-summary">
+                    <!-- 分类进度预览由 JS 动态填充 -->
                 </div>
                 <div class="nav-item" onclick="switchPage('tech')">
                     <span class="nav-icon">📚</span>
@@ -872,7 +927,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Dashboard Page -->
-            <div class="page active" id="page-dashboard">
+            <div class="page" id="page-dashboard">
                 <header class="page-header animate-in">
                     <h1 class="page-title">Mission Dashboard</h1>
                     <p class="page-subtitle">后端开发 · Go技术栈 · 互联网大厂 · 30天冲刺</p>
@@ -888,11 +943,11 @@
                         <div class="stat-label">已完成项</div>
                     </div>
                     <div class="stat-card animate-in delay-3">
-                        <div class="stat-value orange" id="stat-progress">0</div>
+                        <div class="stat-value orange" id="stat-progress">49</div>
                         <div class="stat-label">进行中</div>
                     </div>
                     <div class="stat-card animate-in delay-4">
-                        <div class="stat-value red" id="stat-pending">0</div>
+                        <div class="stat-value red" id="stat-pending">163</div>
                         <div class="stat-label">待开始</div>
                     </div>
                 </div>
@@ -904,7 +959,35 @@
                             各模块进度概览
                         </div>
                     </div>
-                    <div id="module-progress-list"></div>
+                    <div id="module-progress-list">
+                <div style="margin-bottom: 12px">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px">
+                        <span style="font-size: 13px">LeetCode Hot 100</span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/100</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 12px">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px">
+                        <span style="font-size: 13px">Go技术复习</span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/53</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px">
+                        <span style="font-size: 13px">系统设计题库</span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
                 </div>
 
                 <div class="card animate-in delay-3">
@@ -936,7 +1019,7 @@
             </div>
 
             <!-- LeetCode Page -->
-            <div class="page" id="page-leetcode">
+            <div class="page active" id="page-leetcode">
                 <header class="page-header animate-in">
                     <h1 class="page-title">LeetCode Hot 100</h1>
                     <p class="page-subtitle">大厂面试必刷核心题目 · 点击勾选完成状态</p>
@@ -958,7 +1041,845 @@
                     </div>
                 </div>
 
-                <div id="leetcode-categories" class="animate-in delay-2"></div>
+                <div id="leetcode-categories" class="animate-in delay-2"><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            哈希
+                        </div>
+                        <div class="category-count">0/3</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('两数之和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#1</span> 两数之和</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('字母异位词分组')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#49</span> 字母异位词分组</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最长连续序列')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#128</span> 最长连续序列</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            双指针
+                        </div>
+                        <div class="category-count">0/4</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('移动零')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#283</span> 移动零</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('盛最多水的容器')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#11</span> 盛最多水的容器</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('三数之和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#15</span> 三数之和</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('接雨水')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#42</span> 接雨水</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            滑动窗口
+                        </div>
+                        <div class="category-count">0/2</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('无重复字符的最长子串')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#3</span> 无重复字符的最长子串</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('找到字符串中所有字母异位词')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#438</span> 找到字符串中所有字母异位词</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            子串
+                        </div>
+                        <div class="category-count">0/3</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('和为 K 的子数组')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#560</span> 和为 K 的子数组</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('滑动窗口最大值')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#239</span> 滑动窗口最大值</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最小覆盖子串')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#76</span> 最小覆盖子串</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            普通数组
+                        </div>
+                        <div class="category-count">0/5</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最大子数组和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#53</span> 最大子数组和</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('合并区间')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#56</span> 合并区间</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('轮转数组')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#189</span> 轮转数组</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('除自身以外数组的乘积')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#238</span> 除自身以外数组的乘积</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('缺失的第一个正数')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#41</span> 缺失的第一个正数</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            矩阵
+                        </div>
+                        <div class="category-count">0/4</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('矩阵置零')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#73</span> 矩阵置零</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('螺旋矩阵')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#54</span> 螺旋矩阵</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('旋转图像')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#48</span> 旋转图像</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('搜索二维矩阵 II')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#240</span> 搜索二维矩阵 II</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            链表
+                        </div>
+                        <div class="category-count">0/14</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('相交链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#160</span> 相交链表</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('反转链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#206</span> 反转链表</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('回文链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#234</span> 回文链表</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('环形链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#141</span> 环形链表</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('环形链表 II')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#142</span> 环形链表 II</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('合并两个有序链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#21</span> 合并两个有序链表</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('两数相加')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#2</span> 两数相加</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('删除链表的倒数第 N 个结点')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#19</span> 删除链表的倒数第 N 个结点</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('两两交换链表中的节点')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#24</span> 两两交换链表中的节点</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('K 个一组翻转链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#25</span> K 个一组翻转链表</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('随机链表的复制')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#138</span> 随机链表的复制</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('排序链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#148</span> 排序链表</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('合并 K 个升序链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#23</span> 合并 K 个升序链表</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('LRU 缓存')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#146</span> LRU 缓存</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            二叉树
+                        </div>
+                        <div class="category-count">0/15</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的中序遍历')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#94</span> 二叉树的中序遍历</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的最大深度')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#104</span> 二叉树的最大深度</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('翻转二叉树')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#226</span> 翻转二叉树</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('对称二叉树')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#101</span> 对称二叉树</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的直径')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#543</span> 二叉树的直径</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的层序遍历')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#102</span> 二叉树的层序遍历</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('将有序数组转换为二叉搜索树')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#108</span> 将有序数组转换为二叉搜索树</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('验证二叉搜索树')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#98</span> 验证二叉搜索树</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉搜索树中第 K 小的元素')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#230</span> 二叉搜索树中第 K 小的元素</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的右视图')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#199</span> 二叉树的右视图</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树展开为链表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#114</span> 二叉树展开为链表</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('从前序与中序遍历序列构造二叉树')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#105</span> 从前序与中序遍历序列构造二叉树</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('路径总和 III')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#437</span> 路径总和 III</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树的最近公共祖先')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#236</span> 二叉树的最近公共祖先</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('二叉树中的最大路径和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#124</span> 二叉树中的最大路径和</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            图论
+                        </div>
+                        <div class="category-count">0/4</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('岛屿数量')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#200</span> 岛屿数量</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('腐烂的橘子')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#994</span> 腐烂的橘子</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('课程表')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#207</span> 课程表</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('实现 Trie (前缀树)')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#208</span> 实现 Trie (前缀树)</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            回溯
+                        </div>
+                        <div class="category-count">0/8</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('全排列')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#46</span> 全排列</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('子集')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#78</span> 子集</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('电话号码的字母组合')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#17</span> 电话号码的字母组合</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('组合总和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#39</span> 组合总和</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('括号生成')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#22</span> 括号生成</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('单词搜索')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#79</span> 单词搜索</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('分割回文串')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#131</span> 分割回文串</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('N 皇后')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#51</span> N 皇后</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            二分查找
+                        </div>
+                        <div class="category-count">0/6</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('搜索插入位置')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#35</span> 搜索插入位置</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('搜索二维矩阵')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#74</span> 搜索二维矩阵</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('在排序数组中查找元素的第一个和最后一个位置')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#34</span> 在排序数组中查找元素的第一个和最后一个位置</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('搜索旋转排序数组')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#33</span> 搜索旋转排序数组</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('寻找旋转排序数组中的最小值')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#153</span> 寻找旋转排序数组中的最小值</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('寻找两个正序数组的中位数')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#4</span> 寻找两个正序数组的中位数</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            栈
+                        </div>
+                        <div class="category-count">0/5</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('有效的括号')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#20</span> 有效的括号</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最小栈')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#155</span> 最小栈</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('字符串解码')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#394</span> 字符串解码</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('每日温度')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#739</span> 每日温度</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('柱状图中最大的矩形')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#84</span> 柱状图中最大的矩形</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            堆
+                        </div>
+                        <div class="category-count">0/3</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('数组中的第K个最大元素')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#215</span> 数组中的第K个最大元素</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('前 K 个高频元素')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#347</span> 前 K 个高频元素</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('数据流的中位数')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#295</span> 数据流的中位数</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            贪心算法
+                        </div>
+                        <div class="category-count">0/4</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('买卖股票的最佳时机')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#121</span> 买卖股票的最佳时机</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('跳跃游戏')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#55</span> 跳跃游戏</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('跳跃游戏 II')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#45</span> 跳跃游戏 II</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('划分字母区间')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#763</span> 划分字母区间</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            动态规划
+                        </div>
+                        <div class="category-count">0/10</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('爬楼梯')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#70</span> 爬楼梯</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('杨辉三角')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#118</span> 杨辉三角</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('打家劫舍')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#198</span> 打家劫舍</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('完全平方数')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#279</span> 完全平方数</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('零钱兑换')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#322</span> 零钱兑换</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('单词拆分')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#139</span> 单词拆分</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最长递增子序列')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#300</span> 最长递增子序列</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('乘积最大子数组')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#152</span> 乘积最大子数组</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('分割等和子集')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#416</span> 分割等和子集</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最长有效括号')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#32</span> 最长有效括号</div>
+                                    <div class="checklist-meta meta-hard">困难</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            多维动态规划
+                        </div>
+                        <div class="category-count">0/5</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('不同路径')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#62</span> 不同路径</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最小路径和')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#64</span> 最小路径和</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最长回文子串')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#5</span> 最长回文子串</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('最长公共子序列')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#1143</span> 最长公共子序列</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('编辑距离')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#72</span> 编辑距离</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div><div class="leetcode-category">
+                    <div class="category-header category-toggle" onclick="toggleCategory(this)">
+                        <div class="category-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            <span class="expand-icon">▼</span>
+                            技巧
+                        </div>
+                        <div class="category-count">0/5</div>
+                    </div>
+                    <div class="category-items">
+                        <div class="checklist">
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('只出现一次的数字')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#136</span> 只出现一次的数字</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('多数元素')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#169</span> 多数元素</div>
+                                    <div class="checklist-meta meta-easy">简单</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('颜色分类')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#75</span> 颜色分类</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('下一个排列')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#31</span> 下一个排列</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                                <div class="checklist-item " onclick="toggleLeetCode('寻找重复数')">
+                                    <div class="check-box"></div>
+                                    <div class="checklist-text"><span class="problem-id">#287</span> 寻找重复数</div>
+                                    <div class="checklist-meta meta-medium">中等</div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div></div>
             </div>
 
             <!-- Tech Review Page -->
@@ -980,11 +1901,353 @@
                     </div>
                     <div class="progress-stats">
                         <div class="stat"><div class="stat-dot stat-done"></div><span id="tech-done">0</span> 完成</div>
-                        <div class="stat"><div class="stat-dot stat-pending"></div><span id="tech-pending">0</span> 待复习</div>
+                        <div class="stat"><div class="stat-dot stat-pending"></div><span id="tech-pending">53</span> 待复习</div>
                     </div>
                 </div>
 
-                <div id="tech-categories" class="animate-in delay-2"></div>
+                <div id="tech-categories" class="animate-in delay-2"><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            Go底层原理
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/10</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('GC垃圾回收机制（三色标记、混合写屏障）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">GC垃圾回收机制（三色标记、混合写屏障）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('GMP调度模型（Goroutine、M、P的关系）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">GMP调度模型（Goroutine、M、P的关系）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Channel实现原理（环形缓冲区、锁机制）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Channel实现原理（环形缓冲区、锁机制）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Slice底层实现（数组指针、len、cap）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Slice底层实现（数组指针、len、cap）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Map底层实现（哈希表、溢出桶、扩容）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Map底层实现（哈希表、溢出桶、扩容）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Interface实现原理（eface、iface、动态派发）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Interface实现原理（eface、iface、动态派发）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('内存分配器（mspan、mcache、mcentral、mheap）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">内存分配器（mspan、mcache、mcentral、mheap）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('反射原理（Type、Value、反射定律）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">反射原理（Type、Value、反射定律）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('context实现与传递机制')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">context实现与传递机制</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('sync包原理（Mutex、RWMutex、WaitGroup、Pool）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">sync包原理（Mutex、RWMutex、WaitGroup、Pool）</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            分布式系统
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/8</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('CAP理论与BASE理论')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">CAP理论与BASE理论</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('一致性协议（2PC、3PC、Paxos、Raft）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">一致性协议（2PC、3PC、Paxos、Raft）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('分布式事务解决方案（TCC、Saga、本地消息表）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">分布式事务解决方案（TCC、Saga、本地消息表）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('分布式ID生成方案（雪花算法、UUID、数据库自增）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">分布式ID生成方案（雪花算法、UUID、数据库自增）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('分布式锁实现（Redis、ZooKeeper、etcd）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">分布式锁实现（Redis、ZooKeeper、etcd）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('服务注册与发现机制')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">服务注册与发现机制</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('分布式session方案')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">分布式session方案</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('幂等性设计与实现')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">幂等性设计与实现</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            微服务架构
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/8</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('服务拆分原则与边界划分')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">服务拆分原则与边界划分</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('RPC框架原理（gRPC、Thrift）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">RPC框架原理（gRPC、Thrift）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('服务治理（熔断、降级、限流）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">服务治理（熔断、降级、限流）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('API网关设计与实现')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">API网关设计与实现</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('配置中心架构')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">配置中心架构</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('链路追踪实现（OpenTelemetry）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">链路追踪实现（OpenTelemetry）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('容器化与K8s调度原理')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">容器化与K8s调度原理</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('容灾架构设计（同城双活、异地多活）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">容灾架构设计（同城双活、异地多活）</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            消息队列
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/6</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('Kafka架构原理（Broker、Topic、Partition）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Kafka架构原理（Broker、Topic、Partition）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('消息可靠性保证（ACK机制、持久化）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">消息可靠性保证（ACK机制、持久化）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('消息顺序性保证')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">消息顺序性保证</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('消息积压处理方案')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">消息积压处理方案</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('消息去重方案')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">消息去重方案</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('RocketMQ vs Kafka对比')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">RocketMQ vs Kafka对比</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            Redis缓存
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/7</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('Redis数据结构与底层实现')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Redis数据结构与底层实现</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('缓存穿透、击穿、雪崩解决方案')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">缓存穿透、击穿、雪崩解决方案</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('缓存与数据库一致性方案')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">缓存与数据库一致性方案</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Redis集群架构（主从、哨兵、Cluster）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Redis集群架构（主从、哨兵、Cluster）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Redis持久化（RDB、AOF）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Redis持久化（RDB、AOF）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Redis分布式锁实现')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Redis分布式锁实现</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('Redis过期策略与内存淘汰')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">Redis过期策略与内存淘汰</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            MySQL数据库
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/8</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('InnoDB存储引擎架构')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">InnoDB存储引擎架构</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('索引原理（B+树、聚簇索引、覆盖索引）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">索引原理（B+树、聚簇索引、覆盖索引）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('事务隔离级别与MVCC实现')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">事务隔离级别与MVCC实现</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('锁机制（行锁、间隙锁、临键锁）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">锁机制（行锁、间隙锁、临键锁）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('SQL优化与执行计划分析')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">SQL优化与执行计划分析</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('分库分表方案（垂直、水平）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">分库分表方案（垂直、水平）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('主从复制原理与延迟问题')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">主从复制原理与延迟问题</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('慢查询分析与优化')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">慢查询分析与优化</div>
+                            </div>
+                        
+                    </div>
+                </div><div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span style="color: var(--accent-cyan)">▸</span>
+                            系统设计方法论
+                        </div>
+                        <div class="card-title" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary)">0/6</div>
+                    </div>
+                    <div class="checklist">
+                        
+                            <div class="checklist-item " onclick="toggleTech('系统设计面试框架（REACTO方法）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">系统设计面试框架（REACTO方法）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('高并发系统设计原则')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">高并发系统设计原则</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('高可用架构设计要点')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">高可用架构设计要点</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('性能瓶颈定位方法论')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">性能瓶颈定位方法论</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('架构演进思路（单机→分布式）')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">架构演进思路（单机→分布式）</div>
+                            </div>
+                        
+                            <div class="checklist-item " onclick="toggleTech('容量预估与系统规划')">
+                                <div class="check-box"></div>
+                                <div class="checklist-text">容量预估与系统规划</div>
+                            </div>
+                        
+                    </div>
+                </div></div>
             </div>
 
             <!-- System Design Page -->
@@ -1006,11 +2269,95 @@
                     </div>
                     <div class="progress-stats">
                         <div class="stat"><div class="stat-dot stat-done"></div><span id="system-done">0</span> 完成</div>
-                        <div class="stat"><div class="stat-dot stat-pending"></div><span id="system-pending">0</span> 待练习</div>
+                        <div class="stat"><div class="stat-dot stat-pending"></div><span id="system-pending">10</span> 待练习</div>
                     </div>
                 </div>
 
-                <div id="system-list" class="animate-in delay-2"></div>
+                <div id="system-list" class="animate-in delay-2">
+                <div class="checklist">
+                    
+                        <div class="checklist-item " onclick="toggleSystem('秒杀系统设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">秒杀系统设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">限流 · 预扣库存 · 异步下单 · 削峰填谷 · 防超卖</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('短链系统设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">短链系统设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">哈希算法 · 跳转服务 · 存储优化 · 缓存策略</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('Feed流系统设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">Feed流系统设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">推拉模式 ·  Timeline · 关注关系 · 排序策略</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('支付系统设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">支付系统设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">幂等性 · 状态机 · 对账机制 · 分布式事务</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('分布式ID生成')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">分布式ID生成</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">雪花算法 · 数据库自增 · 号段模式 · Leaf方案</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('高可用架构设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">高可用架构设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">故障检测 · 自动恢复 · 降级熔断 · 异地多活</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('消息推送系统')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">消息推送系统</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">长连接 · 推送策略 · 消息队列 · 到达率</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('搜索引擎设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">搜索引擎设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">倒排索引 · 分词 · 排序算法 · 分布式检索</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('分布式配置中心')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">分布式配置中心</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">配置存储 · 推送机制 · 版本管理 · 灰度发布</div>
+                            </div>
+                        </div>
+                    
+                        <div class="checklist-item " onclick="toggleSystem('限流系统设计')">
+                            <div class="check-box"></div>
+                            <div class="checklist-text">
+                                <div style="font-weight: 500">限流系统设计</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px">令牌桶 · 漏桶 · 滑动窗口 · 分布式限流</div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
             </div>
 
             <!-- Interview Prep Page -->
@@ -1055,7 +2402,146 @@
                     <p class="page-subtitle">互联网大厂投递状态 · 面试进度管理</p>
                 </header>
 
-                <div class="company-grid animate-in delay-1" id="company-grid"></div>
+                <div class="company-grid animate-in delay-1" id="company-grid">
+                <div class="company-card">
+                    <div class="company-logo">🔵</div>
+                    <div class="company-name">字节跳动</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px">重算法 · 重系统设计 · Base高 · 加班多</div>
+                    <div class="company-status">
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '未投递')">未投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '已投递')">已投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '笔试通过')">笔试通过</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '一面')">一面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '二面')">二面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '三面')">三面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', 'HR面')">HR面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '已Offer')">已Offer</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('字节跳动', '已拒')">已拒</div>
+                        
+                    </div>
+                </div>
+            
+                <div class="company-card">
+                    <div class="company-logo">🟠</div>
+                    <div class="company-name">阿里巴巴</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px">重架构 · 重项目 · P序列晋升 · 业务线多</div>
+                    <div class="company-status">
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '未投递')">未投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '已投递')">已投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '笔试通过')">笔试通过</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '一面')">一面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '二面')">二面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '三面')">三面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '交叉面')">交叉面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', 'HR面')">HR面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '已Offer')">已Offer</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('阿里巴巴', '已拒')">已拒</div>
+                        
+                    </div>
+                </div>
+            
+                <div class="company-card">
+                    <div class="company-logo">🟢</div>
+                    <div class="company-name">腾讯</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px">重系统设计 · WXG/IEG/TEG · 福利好 · 稳定性</div>
+                    <div class="company-status">
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '未投递')">未投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '已投递')">已投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '笔试通过')">笔试通过</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '一面')">一面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '二面')">二面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '三面')">三面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '总监面')">总监面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', 'HR面')">HR面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '已Offer')">已Offer</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('腾讯', '已拒')">已拒</div>
+                        
+                    </div>
+                </div>
+            
+                <div class="company-card">
+                    <div class="company-logo">🟡</div>
+                    <div class="company-name">美团</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px">重业务理解 · L序列 · 本地生活 · 成长快</div>
+                    <div class="company-status">
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '未投递')">未投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '已投递')">已投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '笔试通过')">笔试通过</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '一面')">一面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '二面')">二面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '三面')">三面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', 'HR面')">HR面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '已Offer')">已Offer</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('美团', '已拒')">已拒</div>
+                        
+                    </div>
+                </div>
+            
+                <div class="company-card">
+                    <div class="company-logo">🔴</div>
+                    <div class="company-name">快手</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px">重算法 · 短视频业务 · Base不错 · 效率文化</div>
+                    <div class="company-status">
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '未投递')">未投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '已投递')">已投递</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '笔试通过')">笔试通过</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '一面')">一面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '二面')">二面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '三面')">三面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', 'HR面')">HR面</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '已Offer')">已Offer</div>
+                        
+                            <div class="status-tag " onclick="setCompanyStatus('快手', '已拒')">已拒</div>
+                        
+                    </div>
+                </div>
+            </div>
             </div>
         </main>
     </div>
@@ -1452,7 +2938,7 @@
                     <div class="category-items">
                         <div class="checklist">
                             ${items.map(item => `
-                                <div class="checklist-item ${state.leetcode[item.name] ? 'checked' : ''}" onclick="toggleLeetCode('${item.name}')">
+                                <div class="checklist-item ${state.leetcode[item.name] ? 'checked' : ''}" onclick="toggleLeetCode('${item.name}', event)">
                                     <div class="check-box">${state.leetcode[item.name] ? '✓' : ''}</div>
                                     <div class="checklist-text"><span class="problem-id">#${item.id}</span> ${item.name}</div>
                                     <div class="checklist-meta ${item.difficulty === '简单' ? 'meta-easy' : item.difficulty === '中等' ? 'meta-medium' : 'meta-hard'}">${item.difficulty}</div>
@@ -1467,6 +2953,32 @@
             document.getElementById('leetcode-done').textContent = totalDone;
             document.getElementById('leetcode-pending').textContent = totalPending;
             document.getElementById('leetcode-progress-bar').style.width = `${totalDone}%`;
+
+            // 更新 sidebar 分类进度预览
+            updateLeetCodeSummary();
+        }
+
+        function updateLeetCodeSummary() {
+            const summary = document.getElementById('leetcode-summary');
+            let html = '';
+            Object.entries(leetcodeData).forEach(([category, items]) => {
+                let catDone = 0;
+                items.forEach(item => {
+                    if (state.leetcode[item.name]) catDone++;
+                });
+                const percent = Math.round((catDone / items.length) * 100);
+                html += `
+                    <div class="leetcode-summary-item">
+                        <span class="leetcode-summary-name">${category}</span>
+                        <span class="leetcode-summary-progress">${catDone}/${items.length}</span>
+                        <div class="leetcode-summary-bar">
+                            <div class="leetcode-summary-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            summary.innerHTML = html;
+            summary.classList.add('show');
         }
 
         function updateTechUI() {
@@ -1590,9 +3102,11 @@
             header.parentElement.classList.toggle('expanded');
         }
 
-        function toggleLeetCode(name) {
+        function toggleLeetCode(name, event) {
+            if (event) event.stopPropagation();
             state.leetcode[name] = !state.leetcode[name];
             saveState();
+            updateLeetCodeUI();
         }
 
         function toggleTech(name) {
@@ -1753,5 +3267,5 @@
 
         loadState();
     </script>
-</body>
-</html>
+
+</body></html>
