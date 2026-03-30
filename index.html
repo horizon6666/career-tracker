@@ -2908,6 +2908,17 @@
 
         function updateLeetCodeUI() {
             const container = document.getElementById('leetcode-categories');
+
+            // 保存当前展开的分类
+            const expandedCategories = new Set();
+            container.querySelectorAll('.leetcode-category.expanded').forEach(cat => {
+                const title = cat.querySelector('.category-title');
+                if (title) {
+                    const catName = title.textContent.trim().replace(/^[▸▼\s]+/, '');
+                    expandedCategories.add(catName);
+                }
+            });
+
             container.innerHTML = '';
 
             let totalDone = 0;
@@ -2924,8 +2935,9 @@
                     }
                 });
 
+                const isExpanded = expandedCategories.has(category);
                 const catDiv = document.createElement('div');
-                catDiv.className = 'leetcode-category';
+                catDiv.className = `leetcode-category${isExpanded ? ' expanded' : ''}`;
                 catDiv.innerHTML = `
                     <div class="category-header category-toggle" onclick="toggleCategory(this)">
                         <div class="category-title">
@@ -2935,7 +2947,7 @@
                         </div>
                         <div class="category-count">${catDone}/${items.length}</div>
                     </div>
-                    <div class="category-items">
+                    <div class="category-items${isExpanded ? ' expanded' : ''}">
                         <div class="checklist">
                             ${items.map(item => `
                                 <div class="checklist-item ${state.leetcode[item.name] ? 'checked' : ''}" onclick="toggleLeetCode('${item.name}', event)">
