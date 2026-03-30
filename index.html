@@ -220,6 +220,57 @@
             margin-left: auto;
         }
 
+        /* Data Management */
+        .data-management {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .data-management-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .data-management-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .data-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .data-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-cyan-dim);
+        }
+
+        .export-btn:hover {
+            color: var(--status-done);
+            border-color: var(--status-done)50;
+        }
+
+        .import-btn:hover {
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan)50;
+        }
+
         /* Main Content */
         .main-content {
             flex: 1;
@@ -781,6 +832,19 @@
                 <div class="nav-item" onclick="switchPage('companies')">
                     <span class="nav-icon">🏢</span>
                     <span>公司追踪</span>
+                </div>
+            </div>
+
+            <div class="data-management">
+                <div class="data-management-title">数据管理</div>
+                <div class="data-management-buttons">
+                    <button class="data-btn export-btn" onclick="exportData()">
+                        <span>📤</span> 导出进度
+                    </button>
+                    <button class="data-btn import-btn" onclick="document.getElementById('import-file').click()">
+                        <span>📥</span> 导入进度
+                    </button>
+                    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
                 </div>
             </div>
         </nav>
@@ -1559,6 +1623,111 @@
                 this.classList.remove('show');
             }
         });
+
+        // ========== DATA IMPORT/EXPORT ==========
+
+        function exportData() {
+            const dataStr = JSON.stringify(state, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const filename = `career-tracker-backup-${dateStr}.json`;
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('数据已导出：' + filename);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    // 验证数据格式
+                    if (typeof importedData !== 'object') {
+                        throw new Error('无效的数据格式');
+                    }
+
+                    // 合并导入的数据
+                    state = {
+                        targetDate: importedData.targetDate || state.targetDate,
+                        leetcode: { ...state.leetcode, ...importedData.leetcode },
+                        tech: { ...state.tech, ...importedData.tech },
+                        system: { ...state.system, ...importedData.system },
+                        interview: { ...state.interview, ...importedData.interview },
+                        companies: { ...state.companies, ...importedData.companies }
+                    };
+
+                    saveState();
+                    showToast('数据导入成功！');
+                } catch (err) {
+                    showToast('导入失败：' + err.message, true);
+                }
+            };
+            reader.readAsText(file);
+
+            // 清空文件输入，允许重复导入同一文件
+            event.target.value = '';
+        }
+
+        function showToast(message, isError = false) {
+            // 移除已有的toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (isError ? ' toast-error' : '');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                padding: 12px 20px;
+                background: ${isError ? 'var(--status-pending)' : 'var(--status-done)'};
+                color: white;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Toast animations
+        const toastStyle = document.createElement('style');
+        toastStyle.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(toastStyle);
 
         // ========== INIT ==========
 
